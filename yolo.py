@@ -81,20 +81,33 @@ if __name__ == '__main__':
 	# Get the labels
 	labels = open(FLAGS.labels).read().strip().split('\n')
 
-	# Intializing colors to represent each label uniquely
+	# Initializing colors to represent each label uniquely
 	colors = np.random.randint(0, 255, size=(len(labels), 3), dtype='uint8')
 
-	# Load the weights and configutation to form the pretrained YOLOv3 model
+	# Load the weights and configuration to form the pretrained YOLOv3 model
 	net = cv.dnn.readNetFromDarknet(FLAGS.config, FLAGS.weights)
+
+	unconnected_layers = net.getUnconnectedOutLayers()
+
+	print(f"Unconnected layers: {unconnected_layers} - {len(unconnected_layers)}")
+	for i in unconnected_layers:
+		print(f"Unconnected layer: {i}")
+	if not any(unconnected_layers):
+		raise ValueError('No unconnected output layers found in the neural network')
+	if isinstance(unconnected_layers[0], int):
+		unconnected_layers = [unconnected_layers]
 
 	# Get the output layer names of the model
 	layer_names = net.getLayerNames()
-	layer_names = [layer_names[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-        
+	print(layer_names)
+
+	# Get the names of the output layers
+	layer_names = [layer_names[i -1] for i in unconnected_layers]
+
 	# If both image and video files are given then raise error
 	if FLAGS.image_path is None and FLAGS.video_path is None:
-	    print ('Neither path to an image or path to video provided')
-	    print ('Starting Inference on Webcam')
+		print('Neither path to an image or path to video provided')
+		print('Starting Inference on Webcam')
 
 	# Do inference with given image
 	if FLAGS.image_path:
@@ -151,7 +164,7 @@ if __name__ == '__main__':
 		# Infer real-time on webcam
 		count = 0
 
-		vid = cv.VideoCapture(0)
+		vid = cv.VideoCapture(1)
 		while True:
 			_, frame = vid.read()
 			height, width = frame.shape[:2]
