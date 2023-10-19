@@ -164,7 +164,7 @@ if __name__ == '__main__':
 		# Infer real-time on webcam
 		count = 0
 
-		vid = cv.VideoCapture(1)
+		vid = cv.VideoCapture(0)    # 0 -> index of camera: macbook webcam, 1: camostudio (for using phone etc)
 		while True:
 			_, frame = vid.read()
 			height, width = frame.shape[:2]
