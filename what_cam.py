@@ -5,8 +5,8 @@ def find_camera():
     index = 0
     arr = []
     while True:
-        cap = cv.VideoCapture(index)
-        if not cap.read()[index]:
+        cap = cv.VideoCapture(index)    # 0 -> index of camera: macbook webcam, 1: camostudio (for using phone etc)
+        if not cap.isOpened():        # Check if camera opened successfully
             break
         else:
             arr.append(index)
